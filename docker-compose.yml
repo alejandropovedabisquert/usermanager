@@ -3,6 +3,15 @@ services:
     build: ./usermanagerfront
     ports:
       - "3000:3000"
+    develop:
+      watch:
+        - action: sync
+          path: ./usermanagerfront
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./usermanagerfront/package.json
     depends_on:
       - backend
 
@@ -10,3 +19,12 @@ services:
     build: ./usermanagerapi
     ports:
       - "5050:5050"
+    develop:
+      watch:
+        - action: sync
+          path: ./usermanagerapi
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./usermanagerapi/package.json
