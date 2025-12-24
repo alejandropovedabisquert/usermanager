@@ -1,0 +1,65 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+**/node_modules/
+**/.pnp
+**/.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+**/pnpm-lock.yaml
+**/package-lock.json
+
+# testing
+**/coverage
+**/*.test.js.snap
+
+# next.js (frontend)
+usermanagerfront/.next/
+usermanagerfront/out/
+usermanagerfront/build/
+
+# production
+**/build
+**/dist
+
+# misc
+.DS_Store
+*.pem
+.vscode/
+.idea/
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+**/logs/
+**/*.log
+
+# environment variables - IMPORTANTE
+.env
+.env.*
+!.env.example
+usermanagerapi/.env
+usermanagerfront/.env*
+!usermanagerfront/.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# docker
+.dockerignore
+**/docker-compose.override.yml
+
+# OS files
+Thumbs.db
+*~
+.Spotlight-V100
+.Trashes
