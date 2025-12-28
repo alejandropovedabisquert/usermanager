@@ -45,9 +45,9 @@ export default function UserProfile({
       <DropdownMenuContent align="end">
         {currentUser ? (
           <>
-            <Link href={`/account`}>
-              <DropdownMenuItem className="cursor-pointer">Account</DropdownMenuItem>
-            </Link>
+            <DropdownMenuItem className="cursor-pointer" asChild>
+              <Link href={`/account`}>Account</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout} className="cursor-pointer">
               Log out
@@ -55,12 +55,12 @@ export default function UserProfile({
           </>
         ) : (
           <>
-            <Link href="/login">
-              <DropdownMenuItem className="cursor-pointer">Log in</DropdownMenuItem>
-            </Link>
-            <Link href="/register">
-              <DropdownMenuItem className="cursor-pointer">Register</DropdownMenuItem>
-            </Link>
+            <DropdownMenuItem className="cursor-pointer" asChild>
+              <Link href="/login">Log in</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer" asChild>
+              <Link href="/register">Register</Link>
+            </DropdownMenuItem>
           </>
         )}
       </DropdownMenuContent>

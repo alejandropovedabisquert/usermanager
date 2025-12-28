@@ -1,4 +1,6 @@
+import UserInfo from "@/components/userInfo/UserInfo";
 import { usersApi } from "@/lib/api/users";
+import { redirect } from "next/navigation";
 
 async function fetchCurrentUser() {
   const user = await usersApi.getCurrentUser();
@@ -8,18 +10,12 @@ async function fetchCurrentUser() {
 export default async function Page() {
   const currentUser = await fetchCurrentUser();
   console.log(currentUser);
-  
+  if (!currentUser) {
+    redirect("/login");
+  }
   return (
     <div>
-      <h1>Bienvenido, {currentUser?.username}</h1>
-      <ul>
-        <li>Email: {currentUser?.email}</li>
-        <li>Nombre: {currentUser?.firstName} {currentUser?.lastName}</li>
-        <li>Activo: {currentUser?.isActive ? 'Sí' : 'No'}</li>
-        <li>Rol: {currentUser?.role}</li>
-        <li>Creado: {currentUser?.createdAt}</li>
-        <li>Actualizado: {currentUser?.updatedAt}</li>
-      </ul>
+      <UserInfo user={currentUser} />
     </div>
   );
 }

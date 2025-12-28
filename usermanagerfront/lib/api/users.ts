@@ -32,7 +32,7 @@ export const usersApi = {
       const token = await getAuthToken();
 
       if (!token) {
-        return null;
+        throw new Error('No auth token found');
       }
 
       const user = await apiClient<User>(`${ENDPOINTBASE}/myaccount`, {
@@ -64,8 +64,21 @@ export const usersApi = {
     }),
   create: (data: Omit<User, 'username'>) =>
     apiClient<User>(ENDPOINTBASE, { method: 'POST', body: JSON.stringify(data) }),
-  update: (username: string, data: Partial<Omit<User, 'username'>>) =>
-    apiClient<User>(`${ENDPOINTBASE}/${username}`, { method: 'PUT', body: JSON.stringify(data) }),
+  update: async (username: string, data: Partial<Omit<User, 'username'>> & { password?: string }) => {
+    const token = await getAuthToken();
+
+    if (!token) {
+      throw new Error('No auth token found');
+    }
+
+    return apiClient<{ token: string }>(`${ENDPOINTBASE}/${username}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  },
   delete: (username: string) =>
     apiClient<void>(`${ENDPOINTBASE}/${username}`, { method: 'DELETE' }),
 };
