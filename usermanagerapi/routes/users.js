@@ -1,76 +1,172 @@
-var express = require('express');
-const User = require('../models/User');
-const verifyToken = require('../middleware/verifyToken');
+var express = require("express");
+const User = require("../models/User");
+const verifyToken = require("../middleware/verifyToken");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 var router = express.Router();
 
-router.get('/', async function(req, res) {
-try {
+const JWT_SECRET = process.env.JWT_SECRET;
+
+router.get("/", async function (req, res) {
+  try {
     let results = await User.find({});
 
     if (!results || results.length === 0) {
       return res.status(404).send({ error: "Users not found" });
     }
-    
+
     res.status(200).send(results);
   } catch (error) {
     res.status(500).send({ error: "Server error", details: error.message });
   }
 });
 
-router.get('/:username', verifyToken, async function(req, res) {
+router.post("/login", async function (req, res) {
   try {
-    let query = { username: req.params.username };
-    let result = await User.findOne(query);
-    
-    if (!result) {
-      return res.status(404).send({ error: "User not found" });
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ username: username });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
     }
-    
-    res.status(200).send(result);
-  } catch(error) {
-    res.status(500).send({ error: "Server error", details: error.message });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        isActive: user.isActive,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+      JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", details: error.message });
   }
 });
 
+router.get("/myaccount", verifyToken, async function (req, res) {
+  try {
+    res.json({
+      id: req.user.id,
+      username: req.user.username,
+      email: req.user.email,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      isActive: req.user.isActive,
+      role: req.user.role,
+      createdAt: req.user.createdAt,
+      updatedAt: req.user.updatedAt,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", details: error.message });
+  }
+});
 
-router.post('/', verifyToken, async function(req, res) {
+router.post("/register", async function (req, res) {
+  try {
+    const { username, password, email, firstName, lastName } = req.body;
+    const userExists = await User.findOne({
+      $or: [{ username: username }, { email: email }],
+    });
+    if (userExists) {
+      return res.status(400).json({ message: "User or email already exists" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = new User({
+      username,
+      password: hashedPassword,
+      email,
+      firstName,
+      lastName,
+    });
+
+    const result = await newUser.save();
+
+    res.status(201).json({
+      message: "User registered successfully",
+      userId: result._id,
+    });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Validation error",
+        errors: Object.values(error.errors).map((e) => e.message),
+      });
+    }
+    res.status(500).json({ message: "Server error", details: error.message });
+  }
+});
+
+router.post("/", verifyToken, async function (req, res) {
   try {
     let newDocument = req.body;
     let result = await User.insertOne(newDocument);
     res.status(201).send(result);
-  } catch(error) {
+  } catch (error) {
     res.status(500).send({ error: "Server error", details: error.message });
   }
 });
 
-router.put('/:username', verifyToken, async function(req, res) {
+router.get("/:username", verifyToken, async function (req, res) {
+  try {
+    let query = { username: req.params.username };
+    let result = await User.findOne(query);
+
+    if (!result) {
+      return res.status(404).send({ error: "User not found" });
+    }
+
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send({ error: "Server error", details: error.message });
+  }
+});
+
+router.put("/:username", verifyToken, async function (req, res) {
   try {
     let query = { username: req.params.username };
     let updates = { $set: req.body };
-    
+
     let result = await User.updateOne(query, updates);
-    
+
     if (result.matchedCount === 0) {
       return res.status(404).send({ error: "User not found" });
     }
-    
+
     res.status(200).send({ message: "User updated", result });
-  } catch(error) {
+  } catch (error) {
     res.status(500).send({ error: "Server error", details: error.message });
   }
 });
 
-router.delete('/:username', verifyToken, async function(req, res) {
+router.delete("/:username", verifyToken, async function (req, res) {
   try {
     let query = { username: req.params.username };
     let result = await User.deleteOne(query);
-    
+
     if (result.deletedCount === 0) {
       return res.status(404).send({ error: "User not found" });
     }
-    
+
     res.status(200).send({ message: "User deleted" });
-  } catch(error) {
+  } catch (error) {
     res.status(500).send({ error: "Server error", details: error.message });
   }
 });
