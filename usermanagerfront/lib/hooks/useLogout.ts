@@ -3,6 +3,7 @@
 import { removeAuthToken } from '@/lib/actions/auth';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useAuth } from '@/lib/context/AuthContext';
 
 type LogoutError = {
   message: string;
@@ -13,12 +14,14 @@ export function useLogout() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<LogoutError | null>(null);
     const router = useRouter();
+    const { setUser } = useAuth();
 
     const logout = async () => {
         setIsLoading(true);
         setError(null);
         try {
             await removeAuthToken();
+            setUser(null); // 👈 Limpia el usuario inmediatamente
             router.push('/login');
             router.refresh();
         } catch (error) {

@@ -10,13 +10,10 @@ import {
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { useLogout } from "@/lib/hooks/useLogout";
-import { User } from "@/types/user";
+import { useAuth } from "@/lib/context/AuthContext";
 
-export default function UserProfile({
-  currentUser,
-}: {
-  currentUser: User | null;
-}) {
+export default function UserProfile() {
+  const { currentUser } = useAuth();
   const { logout } = useLogout();
   return (
     <DropdownMenu>

@@ -32,7 +32,7 @@ export const usersApi = {
       const token = await getAuthToken();
 
       if (!token) {
-        throw new Error('No auth token found');
+        return null;
       }
 
       const user = await apiClient<User>(`${ENDPOINTBASE}/myaccount`, {
@@ -68,7 +68,7 @@ export const usersApi = {
     const token = await getAuthToken();
 
     if (!token) {
-      throw new Error('No auth token found');
+      return null;
     }
 
     return apiClient<{ token: string }>(`${ENDPOINTBASE}/${username}`, {

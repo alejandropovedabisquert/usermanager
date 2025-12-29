@@ -6,7 +6,6 @@ export async function proxy(request: NextRequest) {
     const currentUser = await usersApi.getCurrentUser();
 
     if (!currentUser) {
-        // Usuario no autenticado, redirigir al login
         return NextResponse.redirect(new URL('/login', request.url));
     };
 

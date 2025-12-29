@@ -1,14 +1,7 @@
 import Link from "next/link";
 import UserProfile from "../userProfile/UserProfile";
-import { usersApi } from "@/lib/api/users";
-
-async function fetchCurrentUser() {
-  const user = await usersApi.getCurrentUser();
-  return user;
-}
 
 export default async function Header() {
-    const currentUser = await fetchCurrentUser();
     return (
         <header>
           <nav className="w-full p-4 border-b">
@@ -19,7 +12,7 @@ export default async function Header() {
                 </h1>
               </div>
               <div className="h-fit">
-                <UserProfile currentUser={currentUser} />
+                <UserProfile />
               </div>
             </div>
           </nav>

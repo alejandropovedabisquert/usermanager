@@ -37,6 +37,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { User } from "@/types/user";
+import { useAuth } from "@/lib/context/AuthContext";
 
 export default function UsersTable() {
   const [users, setUsers] = useState<User[]>([]);
@@ -47,6 +48,7 @@ export default function UsersTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const { isAdmin, isAuthenticated } = useAuth();
 
   useEffect(() => {
     usersApi
@@ -56,12 +58,12 @@ export default function UsersTable() {
       .finally(() => setLoading(false));
   }, []);
 
-  // useEffect(() => {
-  //   setColumnVisibility((prev) => ({
-  //     ...prev,
-  //     select: isAdmin,
-  //   }));
-  // }, [isAdmin]);
+  useEffect(() => {
+    setColumnVisibility((prev) => ({
+      ...prev,
+      select: isAdmin,
+    }));
+  }, [isAdmin]);
 
   const columns: ColumnDef<User>[] = [
     {
@@ -187,23 +189,29 @@ export default function UsersTable() {
         const user = row.original;
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem className="cursor-pointer" asChild>
-                <Link href={`/user/${user.username}`}>View user</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600 cursor-pointer">
-                Remove user
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          isAuthenticated && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="cursor-pointer" asChild>
+                  <Link href={`/user/${user.username}`}>View user</Link>
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-red-600 cursor-pointer">
+                      Remove user
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
         );
       },
     },
