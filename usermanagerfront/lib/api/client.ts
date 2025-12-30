@@ -8,11 +8,11 @@ export async function apiClient<T>(
   const isServer = typeof window === 'undefined';
   const API_BASE_URL = isServer ? API_BASE_URL_SERVER : API_BASE_URL_CLIENT;
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
     headers: {
       'Content-Type': 'application/json',
       ...options?.headers,
     },
-    ...options,
   });
 
   if (!response.ok) {

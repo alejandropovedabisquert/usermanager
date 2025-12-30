@@ -6,7 +6,7 @@ const ENDPOINTBASE = '/users';
 
 export const usersApi = {
   getAll: () => apiClient<User[]>(ENDPOINTBASE),
-  getByUsername: async (username: string) => {
+  getById: async (id: string) => {
     try {
       const token = await getAuthToken();
 
@@ -14,7 +14,7 @@ export const usersApi = {
         return null;
       }
 
-      const user = await apiClient<User>(`/users/${username}`, {
+      const user = await apiClient<User>(`/users/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -23,7 +23,7 @@ export const usersApi = {
       return user;
 
     } catch (error) {
-      console.error(`Error fetching user ${username}:`, error);
+      console.error(`Error fetching user ${id}:`, error);
       return null;
     }
   },
@@ -64,20 +64,27 @@ export const usersApi = {
     }),
   create: (data: Omit<User, 'username'>) =>
     apiClient<User>(ENDPOINTBASE, { method: 'POST', body: JSON.stringify(data) }),
-  update: async (username: string, data: Partial<Omit<User, 'username'>> & { password?: string }) => {
-    const token = await getAuthToken();
-
-    if (!token) {
-      return null;
+  update: async (id: string, data: Partial<Omit<User, 'id'>> & { password?: string, username: string }) => {
+    try{
+        const token = await getAuthToken();
+    
+        if (!token) {
+          return null;
+        }
+        console.log(JSON.stringify(data));
+        
+        return await apiClient<{ token: string }>(`${ENDPOINTBASE}/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data),
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
     }
-
-    return apiClient<{ token: string }>(`${ENDPOINTBASE}/${username}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    catch(error){
+        console.error(`Error updating user ${id}:`, error);
+        return null;
+    }
   },
   delete: (username: string) =>
     apiClient<void>(`${ENDPOINTBASE}/${username}`, { method: 'DELETE' }),

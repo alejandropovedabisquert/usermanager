@@ -14,5 +14,5 @@ export async function proxy(request: NextRequest) {
 
 // Configurar qué rutas proteger
 export const config = {
-    matcher: ['/user/:username*', '/account'],
+    matcher: ['/user/:id*', '/account'],
 };

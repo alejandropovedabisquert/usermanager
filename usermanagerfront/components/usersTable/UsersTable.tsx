@@ -199,7 +199,7 @@ export default function UsersTable() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem className="cursor-pointer" asChild>
-                  <Link href={`/user/${user.username}`}>View user</Link>
+                  <Link href={`/user/${user._id}`}>View user</Link>
                 </DropdownMenuItem>
                 {isAdmin && (
                   <>

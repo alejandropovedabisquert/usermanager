@@ -1,17 +1,15 @@
+"use client";
 import UserInfo from "@/components/userInfo/UserInfo";
-import { usersApi } from "@/lib/api/users";
-import { redirect } from "next/navigation";
+import { useAuth } from "@/lib/context/AuthContext";
 
-async function fetchCurrentUser() {
-  const user = await usersApi.getCurrentUser();
-  return user;
-}
-
-export default async function Page() {
-  const currentUser = await fetchCurrentUser();
-  console.log(currentUser);
+export default function Page() {
+  const {currentUser, isLoading} = useAuth();
+  
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
   if (!currentUser) {
-    redirect("/login");
+    return <div>User not found.</div>;
   }
   return (
     <div>

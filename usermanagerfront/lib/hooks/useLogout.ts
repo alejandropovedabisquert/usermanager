@@ -21,7 +21,7 @@ export function useLogout() {
         setError(null);
         try {
             await removeAuthToken();
-            setUser(null); // 👈 Limpia el usuario inmediatamente
+            setUser(null);
             router.push('/login');
             router.refresh();
         } catch (error) {

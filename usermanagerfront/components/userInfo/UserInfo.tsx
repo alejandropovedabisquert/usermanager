@@ -27,10 +27,49 @@ import { ButtonGroup } from "../ui/button-group";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { useAuth } from "@/lib/context/AuthContext";
+import { usersApi } from "@/lib/api/users";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function UserInfo({ user }: { user: User }) {
   const { isAdmin, currentUser } = useAuth();
-  console.log(user);
+  const [username, setUsername] = useState<string>(user.username);
+  const [email, setEmail] = useState<string>(user.email);
+  const [firstName, setFirstName] = useState<string>(user.firstName);
+  const [lastName, setLastName] = useState<string>(user.lastName);
+  const [role, setRole] = useState<string>(user.role);
+  const [isActive, setIsActive] = useState<boolean>(user.isActive);
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+  // console.log(user);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    try {
+      await usersApi
+        .update(user._id, {
+          username: username,
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          role: role,
+          isActive: isActive,
+          // password: password,
+        })
+        .then(() => {
+          router.refresh();
+          setOpen(false);
+        });
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -95,12 +134,12 @@ export default function UserInfo({ user }: { user: User }) {
               </Button>
               {(currentUser?.username === user.username || isAdmin) && (
                 <>
-                  <Dialog>
+                  <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
                       <Button variant="default">Edit User</Button>
                     </DialogTrigger>
                     <DialogContent className="max-h-screen overflow-auto">
-                      <form action="">
+                      <form onSubmit={handleSubmit}>
                         <DialogHeader>
                           <DialogTitle>Edit User</DialogTitle>
                           <DialogDescription>
@@ -117,7 +156,8 @@ export default function UserInfo({ user }: { user: User }) {
                           <Input
                             type="text"
                             id="username"
-                            defaultValue={user.username}
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             className="w-full border border-gray-300 rounded px-3 py-2"
                           />
                         </Field>
@@ -132,7 +172,8 @@ export default function UserInfo({ user }: { user: User }) {
                             <Input
                               type="text"
                               id="firstName"
-                              defaultValue={user.firstName}
+                              value={firstName}
+                              onChange={(e) => setFirstName(e.target.value)}
                               className="w-full border border-gray-300 rounded px-3 py-2"
                             />
                           </Field>
@@ -146,7 +187,8 @@ export default function UserInfo({ user }: { user: User }) {
                             <Input
                               type="text"
                               id="lastName"
-                              defaultValue={user.lastName}
+                              value={lastName}
+                              onChange={(e) => setLastName(e.target.value)}
                               className="w-full border border-gray-300 rounded px-3 py-2"
                             />
                           </Field>
@@ -161,7 +203,8 @@ export default function UserInfo({ user }: { user: User }) {
                           <Input
                             type="email"
                             id="email"
-                            defaultValue={user.email}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className="w-full border border-gray-300 rounded px-3 py-2"
                           />
                         </Field>
@@ -176,6 +219,7 @@ export default function UserInfo({ user }: { user: User }) {
                             type="password"
                             id="password"
                             placeholder="Enter new password"
+                            onChange={(e) => setPassword(e.target.value)}
                             className="w-full border border-gray-300 rounded px-3 py-2"
                           />
                         </Field>
@@ -190,6 +234,7 @@ export default function UserInfo({ user }: { user: User }) {
                             type="password"
                             id="confirmPassword"
                             placeholder="Confirm new password"
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             className="w-full border border-gray-300 rounded px-3 py-2"
                           />
                         </Field>
@@ -204,7 +249,8 @@ export default function UserInfo({ user }: { user: User }) {
                               </FieldLabel>
                               <select
                                 id="role"
-                                defaultValue={user.role}
+                                value={role}
+                                onChange={(e) => setRole(e.target.value)}
                                 className="w-full border border-gray-300 rounded px-3 py-2"
                               >
                                 <option value="user">User</option>
@@ -220,8 +266,9 @@ export default function UserInfo({ user }: { user: User }) {
                               </FieldLabel>
                               <select
                                 id="status"
-                                defaultValue={
-                                  user.isActive ? "active" : "inactive"
+                                value={isActive ? "true" : "false"}
+                                onChange={(e) =>
+                                  setIsActive(e.target.value === "true")
                                 }
                                 className="w-full border border-gray-300 rounded px-3 py-2"
                               >
@@ -235,7 +282,9 @@ export default function UserInfo({ user }: { user: User }) {
                           <DialogClose asChild>
                             <Button variant="secondary">Cancel</Button>
                           </DialogClose>
-                          <Button variant="default">Save Changes</Button>
+                          <Button variant="default" type="submit">
+                            Save Changes
+                          </Button>
                         </DialogFooter>
                       </form>
                     </DialogContent>
