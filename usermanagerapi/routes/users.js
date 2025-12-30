@@ -124,9 +124,9 @@ router.post("/", verifyToken, async function (req, res) {
   }
 });
 
-router.get("/:username", verifyToken, async function (req, res) {
+router.get("/:id", verifyToken, async function (req, res) {
   try {
-    let query = { username: req.params.username };
+    let query = { _id: req.params.id };
     let result = await User.findOne(query);
 
     if (!result) {
@@ -139,9 +139,19 @@ router.get("/:username", verifyToken, async function (req, res) {
   }
 });
 
-router.put("/:username", verifyToken, async function (req, res) {
+router.put("/:id", verifyToken, async function (req, res) {
   try {
-    let query = { username: req.params.username };
+    let query = { _id: req.params.id };
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).send({ error: "No update data provided" });
+    }
+
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      req.body.password = await bcrypt.hash(req.body.password, salt);
+    }
+
     let updates = { $set: req.body };
 
     let result = await User.updateOne(query, updates);
