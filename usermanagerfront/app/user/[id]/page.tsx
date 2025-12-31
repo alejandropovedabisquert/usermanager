@@ -1,4 +1,4 @@
-import UserInfo from "@/components/userInfo/UserInfo";
+import Info from "@/components/user/info/Info";
 import { usersApi } from "@/lib/api/users";
 import { notFound } from "next/navigation";
 
@@ -19,7 +19,7 @@ export default async function Page({
   }
   return (
     <div>
-      <UserInfo user={user} />
+      <Info user={user} />
     </div>
   );
 }

@@ -7,12 +7,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useLogout } from "@/lib/hooks/useLogout";
 import { useAuth } from "@/lib/context/AuthContext";
 
-export default function UserProfile() {
+export default function Profile() {
   const { currentUser } = useAuth();
   const { logout } = useLogout();
   return (

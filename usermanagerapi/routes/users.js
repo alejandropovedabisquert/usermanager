@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 router.get("/", async function (req, res) {
   try {
-    let results = await User.find({});
+    let results = await User.find({}).select("-password");
 
     if (!results || results.length === 0) {
       return res.status(404).send({ error: "Users not found" });
@@ -37,7 +37,7 @@ router.post("/login", async function (req, res) {
 
     const token = jwt.sign(
       {
-        id: user.id,
+        _id: user._id,
         username: user.username,
         email: user.email,
         firstName: user.firstName,
@@ -61,7 +61,7 @@ router.post("/login", async function (req, res) {
 router.get("/myaccount", verifyToken, async function (req, res) {
   try {
     res.json({
-      id: req.user.id,
+      _id: req.user._id,
       username: req.user.username,
       email: req.user.email,
       firstName: req.user.firstName,
@@ -127,7 +127,7 @@ router.post("/", verifyToken, async function (req, res) {
 router.get("/:id", verifyToken, async function (req, res) {
   try {
     let query = { _id: req.params.id };
-    let result = await User.findOne(query);
+    let result = await User.findOne(query).select("-password");
 
     if (!result) {
       return res.status(404).send({ error: "User not found" });

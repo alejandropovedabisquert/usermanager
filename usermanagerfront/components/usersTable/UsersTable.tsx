@@ -48,7 +48,7 @@ export default function UsersTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const { isAdmin, isAuthenticated } = useAuth();
+  const { isAdmin, isAuthenticated, isLoading, currentUser } = useAuth();
 
   useEffect(() => {
     usersApi
@@ -197,19 +197,27 @@ export default function UsersTable() {
                   <MoreHorizontal />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem className="cursor-pointer" asChild>
-                  <Link href={`/user/${user._id}`}>View user</Link>
-                </DropdownMenuItem>
-                {isAdmin && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600 cursor-pointer">
-                      Remove user
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
+              {currentUser?._id === user._id ? (
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="cursor-pointer" asChild>
+                    <Link href={`/account`}>View account</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              ) : (
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="cursor-pointer" asChild>
+                    <Link href={`/user/${user._id}`}>View user</Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-red-600 cursor-pointer">
+                        Remove user
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              )}
             </DropdownMenu>
           )
         );
@@ -236,7 +244,8 @@ export default function UsersTable() {
     },
   });
 
-  if (loading) return <div className="p-8 text-center">Loading users...</div>;
+  if (loading || isLoading)
+    return <div className="p-8 text-center">Loading users...</div>;
   if (error)
     return <div className="p-8 text-center text-red-600">Error: {error}</div>;
 

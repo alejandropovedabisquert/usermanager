@@ -1,5 +1,5 @@
 "use client";
-import UserInfo from "@/components/userInfo/UserInfo";
+import UserInfo from "@/components/user/info/Info";
 import { useAuth } from "@/lib/context/AuthContext";
 
 export default function Page() {

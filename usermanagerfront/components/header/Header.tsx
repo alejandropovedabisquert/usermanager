@@ -1,5 +1,5 @@
 import Link from "next/link";
-import UserProfile from "../userProfile/UserProfile";
+import Profile from "../user/profile/profile";
 
 export default async function Header() {
     return (
@@ -12,7 +12,7 @@ export default async function Header() {
                 </h1>
               </div>
               <div className="h-fit">
-                <UserProfile />
+                <Profile />
               </div>
             </div>
           </nav>

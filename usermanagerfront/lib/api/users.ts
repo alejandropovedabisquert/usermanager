@@ -64,7 +64,7 @@ export const usersApi = {
     }),
   create: (data: Omit<User, 'username'>) =>
     apiClient<User>(ENDPOINTBASE, { method: 'POST', body: JSON.stringify(data) }),
-  update: async (id: string, data: Partial<Omit<User, 'id'>> & { password?: string, username: string }) => {
+  update: async (id: string, data: Partial<Omit<User, 'id'>> & { password?: string }) => {
     try{
         const token = await getAuthToken();
     
