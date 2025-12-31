@@ -28,3 +28,17 @@ services:
             - node_modules/
         - action: rebuild
           path: ./usermanagerapi/package.json
+    environment:
+      MONGO_URI: mongodb://mongo:27017/user_manager
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongodb/data:/data/db
+      - ./mongodb/init:/docker-entrypoint-initdb.d
+      - ./mongodb/dump:/dump
