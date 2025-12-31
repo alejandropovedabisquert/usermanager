@@ -38,6 +38,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { useAuth } from "@/lib/context/AuthContext";
+import Delete from "../user/info/delete/Delete";
 
 export default function UsersTable() {
   const [users, setUsers] = useState<User[]>([]);
@@ -211,8 +212,8 @@ export default function UsersTable() {
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600 cursor-pointer">
-                        Remove user
+                      <DropdownMenuItem className="text-red-600 cursor-pointer" onSelect={(e) => e.preventDefault()}>
+                        <Delete user={user} onDelete={() => setUsers((prev) => prev.filter((u) => u._id !== user._id))}/>
                       </DropdownMenuItem>
                     </>
                   )}

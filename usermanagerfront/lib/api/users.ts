@@ -86,6 +86,23 @@ export const usersApi = {
         return null;
     }
   },
-  delete: (username: string) =>
-    apiClient<void>(`${ENDPOINTBASE}/${username}`, { method: 'DELETE' }),
+  delete: async(id: string) => {
+    try {
+      const token = await getAuthToken();
+
+      if (!token) {
+        return null;
+      }
+
+      return await apiClient<{ token: string }>(`${ENDPOINTBASE}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error(`Error deleting user ${id}:`, error);
+      return null;
+    }
+  },
 };

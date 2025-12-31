@@ -26,6 +26,7 @@ import Link from "next/link";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { useAuth } from "@/lib/context/AuthContext";
 import Edit from "./edit/Edit";
+import Delete from "./delete/Delete";
 
 export default function Info({ user }: { user: User }) {
   const { isAdmin, currentUser } = useAuth();
@@ -96,26 +97,7 @@ export default function Info({ user }: { user: User }) {
                 <>
                   <Edit user={user} />
                   {isAdmin && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="destructive">Delete User</Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Delete User</DialogTitle>
-                          <DialogDescription>
-                            Are you sure you want to delete this user? This
-                            action cannot be undone.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button variant="secondary">Cancel</Button>
-                          </DialogClose>
-                          <Button variant="destructive">Delete</Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                    <Delete user={user} />
                   )}
                 </>
               )}

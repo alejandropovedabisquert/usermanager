@@ -166,9 +166,9 @@ router.put("/:id", verifyToken, async function (req, res) {
   }
 });
 
-router.delete("/:username", verifyToken, async function (req, res) {
+router.delete("/:id", verifyToken, async function (req, res) {
   try {
-    let query = { username: req.params.username };
+    let query = { _id: req.params.id };
     let result = await User.deleteOne(query);
 
     if (result.deletedCount === 0) {

@@ -85,7 +85,6 @@ export default function Edit({ user }: { user: User }) {
 
     if (!validateForm()) return;
 
-    // Crear objeto con solo los campos modificados
     const updateData: Partial<{
       username: string;
       email: string;
@@ -96,24 +95,20 @@ export default function Edit({ user }: { user: User }) {
       password?: string;
     }> = {};
 
-    // Solo añadir campos que han cambiado
     if (username !== user.username) updateData.username = username;
     if (email !== user.email) updateData.email = email;
     if (firstName !== user.firstName) updateData.firstName = firstName;
     if (lastName !== user.lastName) updateData.lastName = lastName;
 
-    // Solo añadir campos de admin si el usuario es admin
     if (isAdmin) {
       if (role !== user.role) updateData.role = role;
       if (isActive !== user.isActive) updateData.isActive = isActive;
     }
 
-    // Solo añadir contraseña si se proporcionó una nueva
     if (password) {
       updateData.password = password;
     }
 
-    // Si no hay cambios, cerrar el diálogo
     if (Object.keys(updateData).length === 0) {
       setOpen(false);
       return;
@@ -124,7 +119,6 @@ export default function Edit({ user }: { user: User }) {
       router.refresh();
       setOpen(false);
 
-      // Resetear campos de contraseña
       setPassword("");
       setConfirmPassword("");
     } catch (error) {
