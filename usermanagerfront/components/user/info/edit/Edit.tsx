@@ -297,8 +297,8 @@ export default function Edit({ user }: { user: User }) {
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   aria-invalid={!!errors.isActive}
                 >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
                 </select>
                 {errors.isActive && <FieldError>{errors.isActive}</FieldError>}
               </Field>
