@@ -20,6 +20,7 @@ import { User } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
+import { UserFormErrors, validateUserForm } from "@/lib/validation";
 
 export default function Edit({ user }: { user: User }) {
   const { isAdmin, currentUser } = useAuth();
@@ -32,50 +33,20 @@ export default function Edit({ user }: { user: User }) {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [open, setOpen] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<UserFormErrors>({});
   const router = useRouter();
 
   const validateForm = () => {
-    const newErrors: typeof errors = {};
-
-    if (!username.trim()) {
-      newErrors.username = "Username is required";
-    }
-
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Email is invalid";
-    }
-
-    if (!firstName.trim()) {
-      newErrors.firstName = "First name is required";
-    }
-
-    if (!lastName.trim()) {
-      newErrors.lastName = "Last name is required";
-    }
-
-    if (!role.trim()) {
-      newErrors.role = "Role is required";
-    }
-
-    if (!isActive && isActive !== false) {
-      newErrors.isActive = "Status is required";
-    }
-
-    if (password && password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    if (!password && confirmPassword) {
-      newErrors.confirmPassword = "Confirm password provided without password";
-    }
-
-    if (password && password !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
+    const newErrors = validateUserForm({
+      username,
+      email,
+      firstName,
+      lastName,
+      password,
+      confirmPassword,
+      role,
+      isActive,
+    }, "edit");
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

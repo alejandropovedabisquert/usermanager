@@ -20,26 +20,18 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
 import { useLogin } from "@/lib/hooks/useLogin";
 import { Loader2 } from "lucide-react";
+import { UserFormErrors, validateUserForm } from "@/lib/validation";
 
 export default function Login() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [errors, setErrors] = useState<{
-    username?: string;
-    password?: string;
-  }>({});
+  const [errors, setErrors] = useState<UserFormErrors>({});
   const { login, error, clearError, isLoading } = useLogin();
   const validateForm = () => {
-    const newErrors: typeof errors = {};
-
-    if (!username.trim()) {
-      newErrors.username = "Username is required";
-    }
-
-    if (!password) {
-      newErrors.password = "Password is required";
-    }
-
+    const newErrors = validateUserForm({
+      username,
+      password,
+    }, "login");
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

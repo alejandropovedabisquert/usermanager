@@ -62,8 +62,27 @@ export const usersApi = {
       method: "POST",
       body: JSON.stringify({ username, password, email, firstName, lastName }),
     }),
-  create: (data: Omit<User, 'username'>) =>
-    apiClient<User>(ENDPOINTBASE, { method: 'POST', body: JSON.stringify(data) }),
+  create: async (data: User) =>{
+    try{
+        const token = await getAuthToken();
+    
+        if (!token) {
+          return null;
+        }
+        
+        return await apiClient<{ token: string }>(ENDPOINTBASE, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+    }
+    catch(error){
+        console.error('Error creating user:', error);
+        return null;
+    }
+  },   
   update: async (id: string, data: Partial<Omit<User, 'id'>> & { password?: string }) => {
     try{
         const token = await getAuthToken();

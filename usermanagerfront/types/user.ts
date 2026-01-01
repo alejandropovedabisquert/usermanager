@@ -6,6 +6,7 @@ export type User = {
     lastName: string;
     isActive: boolean;
     role: string;
+    password?: string;
     createdAt: string;
     updatedAt: string;
 }

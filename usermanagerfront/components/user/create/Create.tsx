@@ -18,35 +18,47 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
-import { useRegister } from "@/lib/hooks/useRegister";
 import { Loader2 } from "lucide-react";
 import { UserFormErrors, validateUserForm } from "@/lib/validation";
+import { useCreate } from "@/lib/hooks/useCreate";
 
-export default function Register() {
+export default function Create() {
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [role, setRole] = useState<string>("user");
+  const [isActive, setIsActive] = useState<boolean>(true);
   const [errors, setErrors] = useState<UserFormErrors>({});
-  const { register, error, clearError, isLoading } = useRegister();
-    const validateForm = () => {
-      const newErrors = validateUserForm({
-        username,
-        email,
-        firstName,
-        lastName,
-        password,
-        confirmPassword,
-      }, "register");
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
-    };
+  const { create, error, clearError, isLoading } = useCreate();
+  const validateForm = () => {
+    const newErrors = validateUserForm({
+      username,
+      email,
+      firstName,
+      lastName,
+      password,
+      confirmPassword,
+      role,
+      isActive,
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
-    await register(username, password, email, firstName, lastName);
+    await create(
+      username,
+      password,
+      email,
+      firstName,
+      lastName,
+      role,
+      isActive
+    );
   };
   useEffect(() => {
     if (error) {
@@ -62,9 +74,9 @@ export default function Register() {
       <div className={cn("flex flex-col gap-6")}>
         <Card>
           <CardHeader>
-            <CardTitle>Create your account</CardTitle>
+            <CardTitle>Create an Account</CardTitle>
             <CardDescription>
-              Enter your details below to create your account
+              Enter the details to create a new account.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -123,6 +135,36 @@ export default function Register() {
                   )}
                 </Field>
               </FieldGroup>
+              <FieldGroup className="grid grid-cols-2 gap-4 mb-6">
+                <Field>
+                  <FieldLabel htmlFor="role">Role</FieldLabel>
+                  <select
+                    id="role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full border border-gray-300 rounded px-3 py-2"
+                    aria-invalid={!!errors.role}
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  {errors.role && <FieldError>{errors.role}</FieldError>}
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="status">Status</FieldLabel>
+                  <select
+                    id="status"
+                    value={status ? "true" : "false"}
+                    onChange={(e) => setIsActive(e.target.value === "true")}
+                    className="w-full border border-gray-300 rounded px-3 py-2"
+                    aria-invalid={!!errors.isActive}
+                  >
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                  </select>
+                  {errors.isActive && <FieldError>{errors.isActive}</FieldError>}
+                </Field>
+              </FieldGroup>
               <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
@@ -138,7 +180,9 @@ export default function Register() {
                   )}
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
+                  <FieldLabel htmlFor="confirmPassword">
+                    Confirm Password
+                  </FieldLabel>
                   <Input
                     id="confirmPassword"
                     type="password"

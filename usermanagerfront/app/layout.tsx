@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Header />
-          <main className="p-2 md:p-24">{children}</main>
+          <main className="p-2 md:py-6 md:px-24">{children}</main>
         </AuthProvider>
       </body>
     </html>

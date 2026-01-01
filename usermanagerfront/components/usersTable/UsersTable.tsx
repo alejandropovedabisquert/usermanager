@@ -212,8 +212,18 @@ export default function UsersTable() {
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600 cursor-pointer" onSelect={(e) => e.preventDefault()}>
-                        <Delete user={user} onDelete={() => setUsers((prev) => prev.filter((u) => u._id !== user._id))}/>
+                      <DropdownMenuItem
+                        className="text-red-600 cursor-pointer"
+                        onSelect={(e) => e.preventDefault()}
+                      >
+                        <Delete
+                          user={user}
+                          onDelete={() =>
+                            setUsers((prev) =>
+                              prev.filter((u) => u._id !== user._id)
+                            )
+                          }
+                        />
                       </DropdownMenuItem>
                     </>
                   )}
@@ -253,14 +263,21 @@ export default function UsersTable() {
   return (
     <div className="w-full p-8">
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Filtrar por email..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        <div className="flex gap-2">
+          <Input
+            placeholder="Filtrar por email..."
+            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("email")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+          {isAdmin && (
+            <Button asChild>
+              <Link href="/create">Create User</Link>
+            </Button>
+          )}
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
