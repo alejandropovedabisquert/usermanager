@@ -11,16 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -96,7 +86,7 @@ export default function Info({ user }: { user: User }) {
               {(currentUser?.username === user.username || isAdmin) && (
                 <>
                   <Edit user={user} />
-                  {isAdmin && (
+                  {isAdmin && currentUser?.username !== user.username && (
                     <Delete user={user} />
                   )}
                 </>

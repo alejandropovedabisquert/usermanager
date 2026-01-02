@@ -30,9 +30,9 @@ export default function Delete({ user, onDelete }: { user: User, onDelete?: () =
       <DialogTrigger asChild>
         {
           pathname == "/" ? (
-            <div>Delete User</div>
+            <div className="cursor-pointer">Delete User</div>
           ) : (
-            <Button variant="destructive">Delete User</Button>
+            <Button variant="destructive" className="cursor-pointer">Delete User</Button>
           )
         }
       </DialogTrigger>
@@ -46,9 +46,9 @@ export default function Delete({ user, onDelete }: { user: User, onDelete?: () =
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="secondary">Cancel</Button>
+            <Button variant="secondary" className="cursor-pointer">Cancel</Button>
           </DialogClose>
-          <Button variant="destructive" onClick={handleSubmit}>
+          <Button variant="destructive" onClick={handleSubmit} className="cursor-pointer">
             {isLoading ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>

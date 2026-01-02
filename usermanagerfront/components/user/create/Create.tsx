@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Field,
   FieldError,
@@ -16,8 +16,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { UserFormErrors, validateUserForm } from "@/lib/validation";
 import { useCreate } from "@/lib/hooks/useCreate";
@@ -32,7 +30,8 @@ export default function Create() {
   const [role, setRole] = useState<string>("user");
   const [isActive, setIsActive] = useState<boolean>(true);
   const [errors, setErrors] = useState<UserFormErrors>({});
-  const { create, error, clearError, isLoading } = useCreate();
+  const { create, isLoading } = useCreate();
+
   const validateForm = () => {
     const newErrors = validateUserForm({
       username,
@@ -47,9 +46,23 @@ export default function Create() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const cleanupFields = () => {
+    setUsername("");
+    setEmail("");
+    setFirstName("");
+    setLastName("");
+    setPassword("");
+    setConfirmPassword("");
+    setRole("user");
+    setIsActive(true);
+    setErrors({});
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
+
     await create(
       username,
       password,
@@ -59,15 +72,8 @@ export default function Create() {
       role,
       isActive
     );
+    cleanupFields();
   };
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        clearError();
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, clearError]);
 
   return (
     <div className="max-w-2xl mx-auto mt-20">
@@ -154,7 +160,7 @@ export default function Create() {
                   <FieldLabel htmlFor="status">Status</FieldLabel>
                   <select
                     id="status"
-                    value={status ? "true" : "false"}
+                    value={isActive ? "true" : "false"}
                     onChange={(e) => setIsActive(e.target.value === "true")}
                     className="w-full border border-gray-300 rounded px-3 py-2"
                     aria-invalid={!!errors.isActive}
@@ -162,7 +168,9 @@ export default function Create() {
                     <option value="true">Active</option>
                     <option value="false">Inactive</option>
                   </select>
-                  {errors.isActive && <FieldError>{errors.isActive}</FieldError>}
+                  {errors.isActive && (
+                    <FieldError>{errors.isActive}</FieldError>
+                  )}
                 </Field>
               </FieldGroup>
               <FieldGroup>
@@ -195,7 +203,7 @@ export default function Create() {
                   )}
                 </Field>
                 <Field>
-                  <Button type="submit">
+                  <Button type="submit" disabled={isLoading} className="cursor-pointer">
                     {isLoading ? (
                       <>
                         <Loader2 className="animate-spin" />
@@ -210,20 +218,6 @@ export default function Create() {
             </form>
           </CardContent>
         </Card>
-      </div>
-      <div
-        className={
-          "absolute right-12 bottom-12 max-w-sm w-full transition-all duration-500" +
-          (error ? " translate-y-0 opacity-100" : " translate-y-12 opacity-0")
-        }
-      >
-        {error && (
-          <Alert variant="destructive" className="bg-red-100">
-            <Terminal />
-            <AlertTitle>Error!!</AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
-          </Alert>
-        )}
       </div>
     </div>
   );

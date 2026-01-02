@@ -16,8 +16,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal } from "lucide-react";
 import { useRegister } from "@/lib/hooks/useRegister";
 import { Loader2 } from "lucide-react";
 import { UserFormErrors, validateUserForm } from "@/lib/validation";
@@ -30,7 +28,7 @@ export default function Register() {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [errors, setErrors] = useState<UserFormErrors>({});
-  const { register, error, clearError, isLoading } = useRegister();
+  const { register, isLoading } = useRegister();
     const validateForm = () => {
       const newErrors = validateUserForm({
         username,
@@ -46,16 +44,9 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
+    console.log("Submitting registration form");
     await register(username, password, email, firstName, lastName);
   };
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        clearError();
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, clearError]);
 
   return (
     <div className="max-w-2xl mx-auto mt-20">
@@ -151,7 +142,7 @@ export default function Register() {
                   )}
                 </Field>
                 <Field>
-                  <Button type="submit">
+                  <Button type="submit" className="cursor-pointer">
                     {isLoading ? (
                       <>
                         <Loader2 className="animate-spin" />
@@ -166,20 +157,6 @@ export default function Register() {
             </form>
           </CardContent>
         </Card>
-      </div>
-      <div
-        className={
-          "absolute right-12 bottom-12 max-w-sm w-full transition-all duration-500" +
-          (error ? " translate-y-0 opacity-100" : " translate-y-12 opacity-0")
-        }
-      >
-        {error && (
-          <Alert variant="destructive" className="bg-red-100">
-            <Terminal />
-            <AlertTitle>Error!!</AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
-          </Alert>
-        )}
       </div>
     </div>
   );

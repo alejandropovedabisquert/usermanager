@@ -16,7 +16,7 @@ export async function apiClient<T>(
   });
 
   if (!response.ok) {
-    throw new Error(`API Error: ${response.statusText}`);
+    throw new Error(JSON.stringify(await response.json().then(data => data.message || data)));
   }
 
   return response.json();

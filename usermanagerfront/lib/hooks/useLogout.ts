@@ -4,35 +4,30 @@ import { removeAuthToken } from '@/lib/actions/auth';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/lib/context/AuthContext';
-
-type LogoutError = {
-  message: string;
-  field?: 'username' | 'password' | 'general';
-};
+import { useToast } from '../context/ToastContext';
 
 export function useLogout() {
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<LogoutError | null>(null);
     const router = useRouter();
     const { setUser } = useAuth();
+    const { showError, showSuccess } = useToast();
 
     const logout = async () => {
         setIsLoading(true);
-        setError(null);
         try {
             await removeAuthToken();
             setUser(null);
             router.push('/login');
             router.refresh();
+            showSuccess('Logout successful');
         } catch (error) {
             const message = error instanceof Error ? error.message : "Invalid credentials";
-            setError({ message, field: 'general' });
+            showError(message, 'Logout failed');
             throw error;
         } finally {
             setIsLoading(false);
         }
     };
-    const clearError = () => setError(null);
 
-    return { logout, isLoading, error, clearError };
+    return { logout, isLoading };
 }

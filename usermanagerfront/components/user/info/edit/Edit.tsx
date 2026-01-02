@@ -111,7 +111,7 @@ export default function Edit({ user }: { user: User }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default">Edit User</Button>
+        <Button variant="default" className="cursor-pointer">Edit User</Button>
       </DialogTrigger>
       <DialogContent className="max-h-screen overflow-auto">
         <form onSubmit={handleSubmit}>
@@ -271,11 +271,11 @@ export default function Edit({ user }: { user: User }) {
           )}
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="secondary" onClick={resetForm}>
+              <Button variant="secondary" onClick={resetForm} className="cursor-pointer">
                 Cancel
               </Button>
             </DialogClose>
-            <Button variant="default" type="submit">
+            <Button variant="default" type="submit" className="cursor-pointer">
               Save Changes
             </Button>
           </DialogFooter>

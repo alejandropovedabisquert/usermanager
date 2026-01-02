@@ -3,29 +3,45 @@
 import { useState } from 'react';
 import { usersApi } from '@/lib/api/users';
 import { User } from '@/types/user';
-
-type LoginError = {
-  message: string;
-  field?: 'username' | 'password' | 'general';
-};
+import { useToast } from '../context/ToastContext';
 
 export function useCreate() {
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<LoginError | null>(null);
+    const { showError, showSuccess } = useToast();
 
-    const create = async (username: string, password: string, email: string, firstName: string, lastName: string, role: string, isActive: boolean) => {
+    const create = async (
+      username: string, 
+      password: string, 
+      email: string, 
+      firstName: string, 
+      lastName: string, 
+      role: string, 
+      isActive: boolean
+    ) => {
         setIsLoading(true);
-        setError(null);
+        
         try {
-            await usersApi.create({ username, password, email, firstName, lastName, role, isActive } as User);
+            const response = await usersApi.create({ 
+              username, 
+              password, 
+              email, 
+              firstName, 
+              lastName, 
+              role, 
+              isActive 
+            } as User);
+            
+            showSuccess(response.message || 'User created successfully');
+            
         } catch (error) {
-            const message = error instanceof Error ? error.message : "Invalid credentials";
-            setError({ message, field: 'general' });
+            const message = error instanceof Error ? error.message : "Failed to create user";
+            showError(message, 'Creation failed');
             throw error;
         } finally {
             setIsLoading(false);
         }
     };
-    const clearError = () => setError(null);
-    return { create, error, isLoading, clearError };
+
+    
+    return { create, isLoading };
 }
