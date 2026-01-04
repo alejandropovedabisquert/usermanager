@@ -39,6 +39,7 @@ import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { useAuth } from "@/lib/context/AuthContext";
 import Delete from "../user/info/delete/Delete";
+import DeleteUsersTable from "./deleteUsersTable/DeleteUsersTable";
 
 export default function UsersTable() {
   const [users, setUsers] = useState<User[]>([]);
@@ -51,12 +52,19 @@ export default function UsersTable() {
   const [rowSelection, setRowSelection] = useState({});
   const { isAdmin, isAuthenticated, isLoading, currentUser } = useAuth();
 
+  async function fetchUsers() {
+    try {
+      const users = await usersApi.getAll();
+      setUsers(users);
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    usersApi
-      .getAll()
-      .then(setUsers)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    fetchUsers();
   }, []);
 
   useEffect(() => {
@@ -217,7 +225,7 @@ export default function UsersTable() {
                         onSelect={(e) => e.preventDefault()}
                       >
                         <Delete
-                          user={user}
+                          usersIds={[user._id]}
                           onDelete={() =>
                             setUsers((prev) =>
                               prev.filter((u) => u._id !== user._id)
@@ -262,8 +270,8 @@ export default function UsersTable() {
 
   return (
     <div className="w-full p-8">
-      <div className="flex items-center py-4">
-        <div className="flex gap-2">
+      <div className="flex items-start sm:items-center py-4">
+        <div className="flex gap-2 flex-col sm:flex-row">
           <Input
             placeholder="Filtrar por email..."
             value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
@@ -273,9 +281,27 @@ export default function UsersTable() {
             className="max-w-sm"
           />
           {isAdmin && (
-            <Button asChild>
-              <Link href="/create">Create User</Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild>
+                <Link href="/create">Create User</Link>
+              </Button>
+              {table.getFilteredSelectedRowModel().rows.length > 0 && (
+                <DeleteUsersTable
+                  usersIds={table
+                    .getFilteredSelectedRowModel()
+                    .rows.map((row) => row.original._id)}
+                  onDelete={() => {
+                    const idsToDelete = table
+                      .getFilteredSelectedRowModel()
+                      .rows.map((row) => row.original._id);
+                    setUsers((prev) =>
+                      prev.filter((user) => !idsToDelete.includes(user._id))
+                    );
+                  }}
+                  onClick={() => table.toggleAllPageRowsSelected(false)}
+                />
+              )}
+            </div>
           )}
         </div>
         <DropdownMenu>

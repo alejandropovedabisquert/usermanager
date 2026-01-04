@@ -3,8 +3,13 @@ import { usersApi } from "@/lib/api/users";
 import { notFound } from "next/navigation";
 
 async function fetchUserById({ id }: { id: string }) {
-  const user = usersApi.getById(id);
-  return user;
+  try {
+    const user = await usersApi.getById(id);
+    return user;
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    return null;
+  }
 }
 
 export default async function Page({

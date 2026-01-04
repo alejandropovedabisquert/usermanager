@@ -87,7 +87,7 @@ export default function Info({ user }: { user: User }) {
                 <>
                   <Edit user={user} />
                   {isAdmin && currentUser?.username !== user.username && (
-                    <Delete user={user} />
+                    <Delete usersIds={[user._id]} />
                   )}
                 </>
               )}

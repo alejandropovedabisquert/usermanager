@@ -410,33 +410,33 @@ router.put("/:id", verifyToken, async function (req, res) {
   }
 });
 
-// DELETE /:id - Delete user by ID
-router.delete("/:id", verifyToken, async function (req, res) {
+// DELETE / - Delete one or multiple users by IDs
+router.delete("/", verifyToken, async function (req, res) {
   try {
+    const { ids } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: "Invalid user ID format" });
+    if (!ids || (Array.isArray(ids) && ids.length === 0)) {
+      return res.status(400).json({ message: "No user IDs provided" });
     }
 
     if (req.user.role !== "admin") {
-      return res.status(403).json({ 
-        message: "Forbidden: Only administrators can delete users" 
-      });
+      return res.status(403).json({ message: "Forbidden: Only administrators can delete users" });
     }
 
-    if (req.user._id.toString() === req.params.id) {
-      return res.status(400).json({ 
-        message: "You cannot delete your own account" 
-      });
+    const idsArray = Array.isArray(ids) ? ids : [ids];
+    if (idsArray.includes(req.user._id.toString())) {
+      return res.status(400).json({ message: "You cannot delete your own account" });
     }
 
-    let result = await User.deleteOne({ _id: req.params.id });
-
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ message: "User not found" });
+    for (const id of idsArray) {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: `Invalid user ID format: ${id}` });
+      }
     }
 
-    res.status(200).json({ message: "User deleted successfully" });
+    const result = await User.deleteMany({ _id: { $in: idsArray } });
+
+    res.status(200).json({ message: `Deleted ${result.deletedCount} user(s)` });
   } catch (error) {
     res.status(500).json({ message: "Server error", details: error.message });
   }

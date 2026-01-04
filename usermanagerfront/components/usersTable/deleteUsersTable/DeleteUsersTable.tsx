@@ -10,44 +10,37 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useDelete } from "@/lib/hooks/useDelete";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-export default function Delete({ usersIds, onDelete }: { usersIds: string[], onDelete?: () => void }) {
+export default function DeleteUsersTable({ usersIds, onDelete, onClick }: { usersIds: string[], onDelete?: () => void, onClick?: () => void }) {
   const { deleteUser, isLoading } = useDelete();
-  const pathname = usePathname();
+  const [open, setOpen] = useState<boolean>(false);
   
   const handleSubmit = async () => {
     try {
-      await deleteUser(usersIds, onDelete);
-      
+      await deleteUser(usersIds, onDelete, onClick);
+      setOpen(false);
     } catch (error) {
       console.error("Error deleting user:", error);
     }
   };
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {
-          pathname == "/" ? (
-            <div className="cursor-pointer">Delete User</div>
-          ) : (
-            <Button variant="destructive" className="cursor-pointer">Delete User</Button>
-          )
-        }
+        <Button variant="destructive" className="cursor-pointer">Delete {usersIds.length} User{usersIds.length > 1 ? "s" : ""}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete User</DialogTitle>
+          <DialogTitle>Delete {usersIds.length} User{usersIds.length > 1 ? "s" : ""}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this user? This action cannot be
-            undone.
+            Are you sure you want to delete {usersIds.length} user{usersIds.length > 1 ? "s" : ""}? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="secondary" className="cursor-pointer">Cancel</Button>
           </DialogClose>
-          <Button variant="destructive" onClick={handleSubmit} className="cursor-pointer">
+          <Button variant="destructive" onClick={handleSubmit} className="cursor-pointer" >
             {isLoading ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>

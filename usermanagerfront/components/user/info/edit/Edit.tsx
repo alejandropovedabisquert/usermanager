@@ -23,7 +23,7 @@ import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import { UserFormErrors, validateUserForm } from "@/lib/validation";
 
 export default function Edit({ user }: { user: User }) {
-  const { isAdmin, currentUser } = useAuth();
+  const { isAdmin, refreshUser } = useAuth();
   const [username, setUsername] = useState<string>(user.username);
   const [email, setEmail] = useState<string>(user.email);
   const [firstName, setFirstName] = useState<string>(user.firstName);
@@ -32,7 +32,7 @@ export default function Edit({ user }: { user: User }) {
   const [isActive, setIsActive] = useState<boolean>(user.isActive);
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [errors, setErrors] = useState<UserFormErrors>({});
   const router = useRouter();
 
@@ -87,6 +87,7 @@ export default function Edit({ user }: { user: User }) {
 
     try {
       await usersApi.update(user._id, updateData);
+      await refreshUser();
       router.refresh();
       setOpen(false);
 

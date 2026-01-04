@@ -7,58 +7,43 @@ const ENDPOINTBASE = '/users';
 export const usersApi = {
   getAll: () => apiClient<User[]>(ENDPOINTBASE),
   getById: async (id: string) => {
-    try {
-      const token = await getAuthToken();
+    const token = await getAuthToken();
 
-      if (!token) {
-        return null;
-      }
-
-      const user = await apiClient<User>(`/users/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      return user;
-
-    } catch (error) {
-      console.error(`Error fetching user ${id}:`, error);
-      return null;
+    if (!token) {
+      throw new Error('No authentication token available');
     }
+
+    const user = await apiClient<User>(`/users/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    return user;
   },
   getCurrentUser: async () => {
-    try {
-      const token = await getAuthToken();
+    const token = await getAuthToken();
 
-      if (!token) {
-        return null;
-      }
-
-      const user = await apiClient<User>(`${ENDPOINTBASE}/myaccount`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        next: {
-          revalidate: 60,
-          tags: ['current-user']
-        }
-      });
-
-      return user;
-
-    } catch (error) {
-      console.error('Error fetching current user:', error);
+    if (!token) {
       return null;
     }
+
+    const user = await apiClient<User>(`${ENDPOINTBASE}/myaccount`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    });
+
+    return user;
   },
   login: (username: string, password: string) =>
-    apiClient<{ message: string; userId: string, token: string }>(`${ENDPOINTBASE}/login`, {
+    apiClient<{ message: string; userId: string, token: string, refreshToken: string }>(`${ENDPOINTBASE}/login`, {
       method: "POST",
       body: JSON.stringify({ username, password }),
     }),
   register: (username: string, password: string, email: string, firstName: string, lastName: string) =>
-    apiClient<{message: string}>(`${ENDPOINTBASE}/register`, {
+    apiClient<{ message: string }>(`${ENDPOINTBASE}/register`, {
       method: "POST",
       body: JSON.stringify({ username, password, email, firstName, lastName }),
     }),
@@ -78,44 +63,40 @@ export const usersApi = {
     });
   },
   update: async (id: string, data: Partial<Omit<User, 'id'>> & { password?: string }) => {
-    try {
-      const token = await getAuthToken();
+    const token = await getAuthToken();
 
-      if (!token) {
-        return null;
-      }
-      console.log(JSON.stringify(data));
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
 
-      return await apiClient<{ token: string }>(`${ENDPOINTBASE}/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+    const response = await apiClient<{ token: string }>(`${ENDPOINTBASE}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.token) {
+      const { setAuthToken } = await import('@/lib/actions/auth');
+      await setAuthToken(response.token);
     }
-    catch (error) {
-      console.error(`Error updating user ${id}:`, error);
-      return null;
-    }
+
+    return response;
   },
-  delete: async (id: string) => {
-    try {
-      const token = await getAuthToken();
+  delete: async (ids: string[]) => {
+    const token = await getAuthToken();
 
-      if (!token) {
-        return null;
-      }
-
-      return await apiClient<{message: string, token: string }>(`${ENDPOINTBASE}/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-    } catch (error) {
-      console.error(`Error deleting user ${id}:`, error);
-      return null;
+    if (!token) {
+      throw new Error('No authentication token available');
     }
+    console.log('Delete users with IDs:', ids);
+    return await apiClient<{ message: string, token: string }>(`${ENDPOINTBASE}/`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ ids }),
+    });
   },
 };
