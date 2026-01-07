@@ -98,6 +98,7 @@ docker-compose down
 docker-compose logs -f
 
 # Ver logs de un servicio específico
+docker-compose logs -f mongo
 docker-compose logs -f backend
 docker-compose logs -f frontend
 ```
