@@ -1,6 +1,10 @@
 # User Manager - Full Stack Application
 
-Aplicación full-stack para gestión de usuarios con autenticación JWT, construida con Node.js/Express en el backend y Next.js en el frontend.
+Aplicación full-stack para gestión de usuarios con autenticación JWT, construida con Node.js/Express en el backend, Next.js en el frontend y MongoDB como BBDD.
+
+## 🚨 Importante!!
+
+Este proyecto esta hecho para que se levante en local no en producción.
 
 ## 🚀 Tecnologías
 
@@ -14,19 +18,20 @@ Aplicación full-stack para gestión de usuarios con autenticación JWT, constru
 - **Next.js** 
 - **TypeScript**
 - **Tailwind CSS**
+- **UI Shadcn**
 
 ## 📋 Requisitos Previos
 
 - Docker y Docker Compose instalados
 - Node.js 18+ (si vas a ejecutar sin Docker)
-- MongoDB Atlas account o MongoDB local (si vas a ejecutar sin Docker)
+- MongoDB local (si vas a ejecutar sin Docker)
 
 ## 🛠️ Instalación y Configuración
 
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/alejandropovedabisquert/usermanager
 cd usermanager
 ```
 
@@ -44,9 +49,17 @@ cp .env.example .env
 Edita `usermanagerapi/.env` con tus credenciales:
 
 ```env
-ATLAS_URI=mongo_uri_here
 JWT_SECRET=tu_clave_secreta_muy_segura_aqui
-PORT=5050
+REFRESH_SECRET=refresh_secret_here
+```
+
+#### Frontend
+
+Crea un archivo `.env` en `usermanagerfront` basándote en `.env.example`:
+
+```bash
+cd usermanagerfront
+cp .env.example .env
 ```
 
 ### 3. Levantar el proyecto con Docker
@@ -62,6 +75,12 @@ Esto levantará:
 - **Backend**: http://localhost:5050
 
 ### 4. Levantar el proyecto sin Docker
+
+#### BBDD
+
+```bash
+mongorestore --host localhost --port 27017 mongodb/dump/
+```
 
 #### Backend
 
@@ -82,31 +101,6 @@ pnpm dev
 ```
 
 El frontend estará corriendo en http://localhost:3000
-
-## 📚 API Endpoints
-
-### Autenticación
-
-- **POST** `/register` - Registrar nuevo usuario
-  ```json
-  {
-    "email": "usuario@ejemplo.com",
-    "password": "contraseña123"
-  }
-  ```
-
-- **POST** `/login` - Iniciar sesión
-  ```json
-  {
-    "email": "usuario@ejemplo.com",
-    "password": "contraseña123"
-  }
-  ```
-
-### Usuarios (requiere autenticación)
-
-- **GET** `/users` - Obtener todos los usuarios
-  - Header: `Authorization: Bearer <token>`
 
 ## 🔒 Seguridad
 
@@ -145,20 +139,22 @@ docker-compose logs -f frontend
 ```
 usermanager/
 ├── docker-compose.yml
-├── usermanagerapi/           # Backend API
+├── usermanagerapi/          # Backend API
 │   ├── app.js               # Configuración Express
 │   ├── bin/www              # Punto de entrada
 │   ├── db/conn.js           # Conexión MongoDB
 │   ├── middleware/          # Middlewares personalizados
 │   ├── models/              # Modelos Mongoose
 │   └── routes/              # Rutas de la API
-└── usermanagerfront/         # Frontend Next.js
-    ├── app/                 # App directory de Next.js
-    └── public/              # Archivos estáticos
+├── usermanagerfront/        # Frontend Next.js
+│   ├── app/                 # App directory de Next.js
+│   └── public/              # Archivos estáticos
+├── mongodb/                 # BBDD
+│   ├── dump/user_manager    # Datos de la tabla
+│   └── init/restore.sh      # Restaura los datos de la BBDD
 ```
 
 ## 📝 Notas
 
-- Asegúrate de tener una base de datos MongoDB activa
-- El backend debe estar corriendo antes que el frontend para evitar errores de conexión
+- Si quieres restaurar los datos de la BBDD elimina la carpeta `/data` de proyecto `mongodb`
 - Los archivos `.env` no están incluidos en el repositorio por seguridad
