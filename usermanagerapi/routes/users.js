@@ -85,6 +85,10 @@ router.post("/login", async function (req, res) {
         expiresIn: "1h",
       }
     );
+
+    if (!token || !refreshToken) {
+      return res.status(498).json({ message: "Token generation failed" });
+    }
     res.json({message: "Login successful", token, refreshToken });
   } catch (error) {
     res.status(500).json({ message: "Server error", details: error.message });

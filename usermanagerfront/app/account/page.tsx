@@ -1,19 +1,10 @@
-"use client";
-import UserInfo from "@/components/user/info/Info";
-import { useAuth } from "@/lib/context/AuthContext";
+import Account from "@/components/user/account/Account";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Account',
+}
 
 export default function Page() {
-  const {currentUser, isLoading} = useAuth();
-  
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (!currentUser) {
-    return <div>User not found.</div>;
-  }
-  return (
-    <div>
-      <UserInfo user={currentUser} />
-    </div>
-  );
+  return <Account/>;
 }

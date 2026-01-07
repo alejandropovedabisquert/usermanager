@@ -1,6 +1,11 @@
 import Info from "@/components/user/info/Info";
 import { usersApi } from "@/lib/api/users";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'User Details',
+}
 
 async function fetchUserById({ id }: { id: string }) {
   try {

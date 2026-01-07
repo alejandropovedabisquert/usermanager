@@ -19,7 +19,7 @@ export async function apiClient<T>(
   });
 
   if (!response.ok) {
-    if ((response.status === 401 || response.status === 403) && retry) {
+    if ((response.status === 498) && retry) {
       try {
         await usersApi.refreshToken();
         return apiClient<T>(endpoint, options, false);

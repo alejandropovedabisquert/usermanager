@@ -1,4 +1,8 @@
 import Link from "next/link";
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: 'Forbidden',
+}
 
 export default function ForbiddenPage() {
   return (
