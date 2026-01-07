@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 var router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const REFRESH_SECRET = process.env.REFRESH_SECRET || JWT_SECRET + "_refresh";
 
 // GET / - Obtain all users
 router.get("/", async function (req, res) {
@@ -49,6 +50,24 @@ router.post("/login", async function (req, res) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    const refreshToken = jwt.sign(
+      {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        isActive: user.isActive,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+      REFRESH_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
     const token = jwt.sign(
       {
         _id: user._id,
@@ -66,7 +85,7 @@ router.post("/login", async function (req, res) {
         expiresIn: "1h",
       }
     );
-    res.json({message: "Login successful", token });
+    res.json({message: "Login successful", token, refreshToken });
   } catch (error) {
     res.status(500).json({ message: "Server error", details: error.message });
   }

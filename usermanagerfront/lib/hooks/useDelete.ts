@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { usersApi } from '@/lib/api/users';
-import { useToast } from '../context/ToastContext';
-import { useAuth } from '../context/AuthContext';
+import { useToast } from '@/lib/context/ToastContext';
+import { useAuth } from '@/lib/context/AuthContext';
 
 export function useDelete() {
     const [isLoading, setIsLoading] = useState(false);

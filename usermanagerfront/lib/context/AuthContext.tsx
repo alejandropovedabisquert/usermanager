@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { usersApi } from '@/lib/api/users';
 import { User } from '@/types/user';
+import { getAuthTokenClient } from "@/lib/actions/authClient";
 
 type AuthContextType = {
     currentUser: User | null;
@@ -38,7 +39,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     useEffect(() => {
-        refreshUser();
+        const restoreSession = async () => {
+            let token = getAuthTokenClient();
+            if (!token) {
+                try {
+                    token = await usersApi.refreshToken();
+                } catch {
+                    setCurrentUser(null);
+                    setError(new Error('Session expired'));
+                    setIsLoading(false);
+                    return;
+                }
+            }
+            await refreshUser();
+        };
+        restoreSession();
     }, []);
 
     const isAuthenticated = !isLoading && currentUser !== null;

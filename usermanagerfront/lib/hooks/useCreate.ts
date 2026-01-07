@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { usersApi } from '@/lib/api/users';
 import { User } from '@/types/user';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '@/lib/context/ToastContext';
 
 export function useCreate() {
     const [isLoading, setIsLoading] = useState(false);

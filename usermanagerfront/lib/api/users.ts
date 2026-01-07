@@ -1,5 +1,5 @@
 import { User } from '@/types/user';
-import { getAuthToken } from '@/lib/actions/auth';
+import { getAuthToken, getRefreshToken, setAuthToken } from '@/lib/actions/auth';
 import { apiClient } from './client';
 
 const ENDPOINTBASE = '/users';
@@ -98,5 +98,15 @@ export const usersApi = {
       },
       body: JSON.stringify({ ids }),
     });
+  },
+  refreshToken: async () => {
+    const refreshToken = await getRefreshToken();
+    if (!refreshToken) throw new Error('No refresh token available');
+    const response = await apiClient<{ token: string }>('/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
+    await setAuthToken(response.token);
+    return response.token;
   },
 };

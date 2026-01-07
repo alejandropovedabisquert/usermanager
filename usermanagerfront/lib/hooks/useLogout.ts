@@ -4,7 +4,7 @@ import { removeAuthToken } from '@/lib/actions/auth';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/lib/context/AuthContext';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '@/lib/context/ToastContext';
 
 export function useLogout() {
     const [isLoading, setIsLoading] = useState(false);

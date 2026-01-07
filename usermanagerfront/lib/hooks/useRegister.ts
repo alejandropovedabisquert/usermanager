@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { usersApi } from '../api/users';
-import { useToast } from '../context/ToastContext';
+import { usersApi } from '@/lib/api/users';
+import { useToast } from '@/lib/context/ToastContext';
 
 export function useRegister() {
     const [isLoading, setIsLoading] = useState(false);
