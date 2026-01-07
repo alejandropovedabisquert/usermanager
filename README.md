@@ -23,8 +23,6 @@ Este proyecto esta hecho para que se levante en local no en producción.
 ## 📋 Requisitos Previos
 
 - Docker y Docker Compose instalados
-- Node.js 18+ (si vas a ejecutar sin Docker)
-- MongoDB local (si vas a ejecutar sin Docker)
 
 ## 🛠️ Instalación y Configuración
 
@@ -73,34 +71,6 @@ docker-compose up --build
 Esto levantará:
 - **Frontend**: http://localhost:3000
 - **Backend**: http://localhost:5050
-
-### 4. Levantar el proyecto sin Docker
-
-#### BBDD
-
-```bash
-mongorestore --host localhost --port 27017 mongodb/dump/
-```
-
-#### Backend
-
-```bash
-cd usermanagerapi
-npm install
-npm start
-```
-
-El servidor estará corriendo en http://localhost:5050
-
-#### Frontend
-
-```bash
-cd usermanagerfront
-pnpm install
-pnpm dev
-```
-
-El frontend estará corriendo en http://localhost:3000
 
 ## 🔒 Seguridad
 
