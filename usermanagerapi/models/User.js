@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  refreshTokenVersion: {
+    type: Number,
+    default: 0,
+  },
 },
 {
     collection: "users",

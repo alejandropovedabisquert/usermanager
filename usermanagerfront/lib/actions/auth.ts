@@ -4,10 +4,10 @@ import { cookies } from 'next/headers';
 export async function setAuthToken(token: string) {
   const cookieStore = await cookies();
   cookieStore.set('token', token, {
-    httpOnly: false,
+    httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 60 * 60, 
+    maxAge: 60 * 15,
     path: '/',
   });
 }

@@ -19,15 +19,25 @@ export async function apiClient<T>(
   });
 
   if (!response.ok) {
-    if ((response.status === 498) && retry) {
+    const shouldTryRefresh =
+      retry &&
+      response.status === 401 &&
+      endpoint !== '/refresh' &&
+      endpoint !== '/users/login' &&
+      endpoint !== '/users/register' &&
+      endpoint !== '/users/logout';
+
+    if (shouldTryRefresh) {
       try {
         await usersApi.refreshToken();
         return apiClient<T>(endpoint, options, false);
-      } catch (refreshError) {
+      } catch {
         throw new Error('Session expired. Please log in again.');
       }
     }
-    throw new Error(JSON.stringify(await response.json().then(data => data.message || data)));
+
+    const payload = await response.json().catch(() => null);
+    throw new Error(JSON.stringify(payload?.message || 'Request failed'));
   }
 
   return response.json();

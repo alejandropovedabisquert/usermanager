@@ -9,6 +9,32 @@ var router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET || JWT_SECRET + "_refresh";
 
+const ACCESS_EXPIRES_IN = "15m";
+const REFRESH_EXPIRES_IN = "7d";
+
+function signAccessToken(user) {
+  return jwt.sign(
+    {
+      sub: user._id.toString(),
+      role: user.role,
+      username: user.username,
+    },
+    JWT_SECRET,
+    { expiresIn: ACCESS_EXPIRES_IN }
+  );
+}
+
+function signRefreshToken(user) {
+  return jwt.sign(
+    {
+      sub: user._id.toString(),
+      tokenVersion: user.refreshTokenVersion,
+    },
+    REFRESH_SECRET,
+    { expiresIn: REFRESH_EXPIRES_IN }
+  );
+}
+
 // GET / - Obtain all users
 router.get("/", async function (req, res) {
   try {
@@ -50,49 +76,39 @@ router.post("/login", async function (req, res) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const refreshToken = jwt.sign(
-      {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        isActive: user.isActive,
-        role: user.role,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-      REFRESH_SECRET,
-      {
-        expiresIn: "7d",
-      }
-    );
+    const token = signAccessToken(user);
+    const refreshToken = signRefreshToken(user);
 
-    const token = jwt.sign(
-      {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        isActive: user.isActive,
-        role: user.role,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-      JWT_SECRET,
-      {
-        expiresIn: "1h",
-      }
-    );
-
-    if (!token || !refreshToken) {
-      return res.status(498).json({ message: "Token generation failed" });
-    }
-    res.json({message: "Login successful", token, refreshToken });
+    return res.json({
+      message: "Login successful",
+      token,
+      refreshToken,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", details: error.message });
   }
+});
+
+router.post("/logout", async function (req, res) {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.json({ message: "Logout successful" });
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
+    const user = await User.findById(decoded.sub);
+
+    if (user && user.refreshTokenVersion === decoded.tokenVersion) {
+      user.refreshTokenVersion += 1;
+      await user.save();
+    }
+  } catch (error) {
+    // Logout idempotente: aunque el token ya no valga, cerramos sesión igual
+  }
+
+  return res.json({ message: "Logout successful" });
 });
 
 // GET /myaccount - Obtain authenticated user's account info
@@ -404,6 +420,7 @@ router.put("/:id", verifyToken, async function (req, res) {
       }
       const salt = await bcrypt.genSalt(10);
       req.body.password = await bcrypt.hash(req.body.password, salt);
+      req.body.refreshTokenVersion = existingUser.refreshTokenVersion + 1;
     }
 
     req.body.updatedAt = new Date();
