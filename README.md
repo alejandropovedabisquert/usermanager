@@ -4,7 +4,7 @@ Aplicación full-stack de gestión de usuarios con autenticación JWT. El backen
 
 ## Importante
 
-Este proyecto está pensado para desarrollo local. No hay hardening ni configuración de producción.
+Este proyecto está pensado para desarrollo local. No hay configuración de producción.
 
 ## Stack y versiones
 
@@ -104,13 +104,13 @@ cd usermanager
 
 Backend:
 
-```powershell
+```bash
 cp ./usermanagerapi/.env.example ./usermanagerapi/.env
 ```
 
 Frontend:
 
-```powershell
+```bash
 cp ./usermanagerfront/.env.example ./usermanagerfront/.env
 ```
 
@@ -232,3 +232,12 @@ Reconstruye imágenes:
 ```bash
 docker compose up --build
 ```
+
+## Usuarios de prueba
+Usuario administrador:
+- Username: admin
+- Password: admin
+
+Usuario no administrador:
+- Username: user1
+- Password: user1
