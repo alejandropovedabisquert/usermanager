@@ -105,13 +105,13 @@ cd usermanager
 Backend:
 
 ```powershell
-Copy-Item .\usermanagerapi\.env.example .\usermanagerapi\.env
+cp ./usermanagerapi/.env.example ./usermanagerapi/.env
 ```
 
 Frontend:
 
 ```powershell
-Copy-Item .\usermanagerfront\.env.example .\usermanagerfront\.env
+cp ./usermanagerfront/.env.example ./usermanagerfront/.env
 ```
 
 Después edita `usermanagerapi/.env` y sustituye `JWT_SECRET` y `REFRESH_SECRET` por valores reales.
